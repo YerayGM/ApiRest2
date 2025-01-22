@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var swaggerJsdoc = require("swagger-jsdoc");
+var swaggerUi = require("swagger-ui-express");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -22,7 +24,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/api/bicicletas', bicicletasAPIRouter); 
+app.use('/api/bicicletas', bicicletasAPIRouter);
+
+// Swagger setup
+const options = {
+  definition: {
+    openapi: "3.1.0",
+    info: {
+      title: "API REST con Swagger",
+      version: "0.1.0",
+      description:
+        "Esta es una aplicación CRUD API sencilla hecha con Express y documentada con Swagger",
+      license: {
+        name: "MIT",
+        url: "https://spdx.org/licenses/MIT.html",
+      },
+      contact: {
+        name: "YerayGM",
+        url: "https://github.com/YerayGM",
+        email: "info@example.com",
+      },
+    },
+    servers: [
+      {
+        url: "http://localhost:3000",
+      },
+    ],
+  },
+  apis: ["./routes/*.js"],
+};
+
+const specs = swaggerJsdoc(options);
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
